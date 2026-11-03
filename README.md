@@ -22,9 +22,12 @@
 현대 AI 서비스 개발자 과정 · 1차 프로젝트 **4조 Insight Bridge**<br/>
 2026.10.21 ~ 2026.11.02
 
-[시연](#시연) · [주요 기능](#주요-기능) · [아키텍처](#시스템-아키텍처) · [시작하기](#시작하기) · [팀 소개](#팀-소개)
+[시연](#시연) · [주요 기능](#주요-기능) · [아키텍처](#시스템-아키텍처) · [임세준 기여](#임세준의-기여-화면관리자운영-계층) · [시작하기](#시작하기) · [팀 소개](#팀-소개)
 
 </div>
+
+> **이 README는 팀원 임세준([@SOLUNA2](https://github.com/SOLUNA2))의 기여를 중심으로 정리한 버전입니다.**<br/>
+> 서비스 전체 설명은 그대로 두고, 임세준이 설계·구현한 **메인 앱 · 로그인 · 대화 기록 · 관리자 대시보드 · 예외 처리 · 비용 측정** 영역을 [별도 섹션](#임세준의-기여-화면관리자운영-계층)과 `👤 임세준` 표시로 강조했습니다.
 
 
 
@@ -33,19 +36,20 @@
 ## 목차
 
 1. [한눈에 보기](#한눈에-보기)
-2. [프로젝트 개요](#프로젝트-개요)
-3. [시연](#시연)
-4. [주요 기능](#주요-기능)
-5. [시스템 아키텍처](#시스템-아키텍처)
-6. [기술 스택](#기술-스택)
-7. [DB 구조](#db-구조)
-8. [문제 해결 사례](#문제-해결-사례)
-9. [검증 결과](#검증-결과)
-10. [시작하기](#시작하기)
-11. [폴더 구조](#폴더-구조)
-12. [팀 소개](#팀-소개)
-13. [프로젝트 진행](#프로젝트-진행)
-14. [자체 평가와 회고](#자체-평가와-회고)
+2. [**임세준의 기여**](#임세준의-기여-화면관리자운영-계층) ⭐
+3. [프로젝트 개요](#프로젝트-개요)
+4. [시연](#시연)
+5. [주요 기능](#주요-기능)
+6. [시스템 아키텍처](#시스템-아키텍처)
+7. [기술 스택](#기술-스택)
+8. [DB 구조](#db-구조)
+9. [문제 해결 사례](#문제-해결-사례)
+10. [검증 결과](#검증-결과)
+11. [시작하기](#시작하기)
+12. [폴더 구조](#폴더-구조)
+13. [팀 소개](#팀-소개)
+14. [프로젝트 진행](#프로젝트-진행)
+15. [자체 평가와 회고](#자체-평가와-회고)
 
 ---
 
@@ -67,6 +71,133 @@
 | **I** | **Integrate** · 여러 보고서를 한눈에 | 본문·표·차트에서 지표를 추출해 보고서 간 비교표와 차트 생성 |
 
 > **근거 우선 원칙**: 모든 답변에 보고서 이름과 쪽수를 붙이고, 근거를 찾지 못하면 LLM을 호출하지 않고 **"자료에 없습니다"** 라고 답합니다.
+
+---
+
+## 임세준의 기여: 화면·관리자·운영 계층
+
+<table>
+<tr>
+<td width="140" align="center">
+<img src="https://github.com/SOLUNA2.png" width="110" /><br/>
+<b>임세준</b><br/>
+<a href="https://github.com/SOLUNA2">@SOLUNA2</a>
+</td>
+<td>
+
+RAG 파이프라인이 **"답을 만드는 엔진"** 이라면, 임세준은 그 엔진을 **사용자가 쓰고 운영자가 관리할 수 있는 서비스로 감싸는 계층**을 맡았습니다.<br/>
+모든 탭을 하나로 묶는 메인 앱, 회원·권한, 대화 기록과 이어가기, 관리자 대시보드, 그리고 모든 화면에 깔린 예외 처리·실행 시간·토큰 비용 측정까지 직접 설계하고 구현했습니다.
+
+</td>
+</tr>
+</table>
+
+### 숫자로 보는 기여
+
+| 커밋 | 병합된 PR | 코드 변경 | 단독 작성 모듈 |
+|:-:|:-:|:-:|:-:|
+| **170개** · 팀 내 최다 | **39개** | **+6,276 / −579줄** | **10개 파일** |
+
+<sub>2026.10.23 ~ 11.01, `git log --author` 기준. 단독 작성 모듈은 `git blame` 기준 작성 비율 95% 이상인 파일입니다.</sub>
+
+### 담당 영역 지도
+
+```mermaid
+flowchart TB
+    subgraph SJ["👤 임세준 담당"]
+        direction TB
+        APP["메인 앱<br/>build_app · init_state<br/>탭 이벤트 연결 · 화면 주인 관리"]
+        AUTH["로그인 · 회원가입<br/>user_view · user_service · user_dao"]
+        HIST["질문 기록 · 대화 이어가기<br/>history_service · qa_log_dao"]
+        ADMIN["관리자 대시보드<br/>admin_view · dashboard_dao (SQL 10종)"]
+        OBS["운영 공통 모듈<br/>safe_call · log_error · measure_time<br/>cost_korean_won · usage_dao"]
+    end
+    subgraph TEAM["팀원 담당"]
+        RAG["RAG 검색 · 질의응답 그래프"]
+        ING["PDF 업로드 · 표/차트 추출"]
+        SUM["요약 · 지표 비교 · 에이전트"]
+    end
+    APP --> AUTH
+    APP --> RAG & ING & SUM
+    RAG -->|qa_logs 기록| HIST
+    RAG & ING & SUM -->|토큰 사용량| OBS
+    HIST & OBS -->|집계| ADMIN
+```
+
+### 핵심 구현
+
+<details open>
+<summary><b>① 관리자 대시보드: 설계 → SQL → 화면까지 단독 구현</b> · <code>admin_view.py</code> · <code>dashboard_dao.py</code></summary>
+<br/>
+
+<img src="docs/demo/10_admin.gif" alt="관리자 대시보드" width="760" />
+
+- **1차 → 2차로 단계적으로 확장**했습니다. 1차(질문 TOP 10, 자료 유무 응답 비율, 응답 시간·비용, 최근 에러 로그)를 먼저 완성한 뒤, 2차에서 일별 추이 차트, 페르소나 비율, 답변 품질(👍/👎), 근거 없는 질문 목록, 처리 방식(route)별 비율을 더했습니다.
+- **집계 SQL 10종**을 직접 작성했습니다. `GROUP BY ... WITH ROLLUP`으로 항목별 수와 합계 행을 한 번에 가져오고, 날짜별 토큰 합계(`llm_usage`)와 평균 응답 시간(`qa_logs`)을 `LEFT JOIN`으로 한 줄에 묶었습니다.
+- **원화 비용을 DB에 저장하지 않고 조회 시점에 계산**합니다. 토큰만 모델별로 모아 두고, 대시보드를 열 때 그날 환율로 환산해 단가·환율이 바뀌어도 과거 데이터를 고칠 필요가 없게 했습니다.
+- **관리자는 관리자 탭만** 보이도록 역할별 화면을 분리하고, 보고서 관리·통계·에러 로그를 탭으로 나눴습니다. 업로드 목록과 에러 로그에는 페이지 넘김을, 비율 데이터에는 파이 차트를 붙였습니다.
+
+</details>
+
+<details>
+<summary><b>② 메인 앱 구조와 사용자 간 화면 분리</b> · <code>app.py</code></summary>
+<br/>
+
+- `build_app` · `init_state` · `main`으로 **모든 탭(보고서·요약·질의응답·기록·관리자)을 하나의 Gradio 앱으로 조립**하는 뼈대를 만들고, 각 팀원의 화면 이벤트를 연결했습니다.
+- **같은 브라우저에서 다른 사람이 로그인하면 이전 사람의 대화·요약·비교 결과가 남아 보이는 문제**를 발견하고, "지금 화면 내용의 주인(`screen_owner`)"을 추적하는 `clear_other_user_screen`으로 해결했습니다. 같은 사람이 다시 로그인하면 화면을 유지하고, 다른 사람이면 17개 화면 부품을 한 번에 비웁니다.
+
+</details>
+
+<details>
+<summary><b>③ 질문 기록과 "대화 이어가기"</b> · <code>history_service.py</code> · <code>qa_log_dao.py</code></summary>
+<br/>
+
+<img src="docs/demo/07_chat_history.gif" alt="과거 대화 기록" width="760" />
+
+- 모든 질문·답변·응답 시간·처리 방식·피드백을 `qa_logs`에 기록하는 `save_qa_log` / `insert_qa_log`를 구현했습니다. 이 기록이 관리자 대시보드의 모든 통계의 재료가 됩니다.
+- `restore_session`은 과거 대화를 **화면(gr.Chatbot)과 LangGraph 체크포인터 양쪽에 복원**합니다. 서버가 재시작돼 메모리 기반 체크포인터가 비어 있어도, DB 기록으로 대화 맥락을 다시 채워 **이어서 질문할 수 있게** 했습니다. 이미 맥락이 있으면 건너뛰어 대화가 두 번 쌓이지 않습니다.
+- 조회는 항상 `user_id`와 함께 해서 **다른 사람의 대화를 불러올 수 없도록** 막았습니다.
+
+</details>
+
+<details>
+<summary><b>④ 회원가입 · 로그인 · 권한</b> · <code>user_view.py</code> · <code>user_service.py</code> · <code>user_dao.py</code></summary>
+<br/>
+
+<img src="docs/demo/01_signup_login.gif" alt="회원가입과 로그인" width="760" />
+
+- 회원 스키마, DAO, 서비스, 화면까지 회원 기능 전 계층을 구현했습니다.
+- 가입 계정은 항상 일반 사용자로 만들고, 관리자 권한은 DB에서만 부여해 화면으로 권한을 올릴 수 없게 했습니다.
+- 로그인 실패 시 "아이디 없음"과 "비밀번호 틀림"을 구분하지 않는 `LoginFailedError` 하나로 알려, 가입된 아이디를 추측할 수 없게 했습니다.
+
+</details>
+
+<details>
+<summary><b>⑤ 운영 공통 모듈: 예외 처리 · 실행 시간 · 토큰 비용</b> · <code>logger.py</code> · <code>metrics.py</code> · <code>llm_client.py</code> · <code>usage_dao.py</code></summary>
+<br/>
+
+| 모듈 | 하는 일 | 팀 전체 사용 |
+|---|---|---|
+| `@safe_call` · `log_error` | 화면 이벤트에서 난 오류를 `logs/app.log`에 남기고, 사용자에게는 내부 정보(DB 주소 등)가 없는 안내 문구만 표시. 일반 함수와 **제너레이터(스트리밍) 함수 모두 지원** | 화면 이벤트 **18곳**에 적용 |
+| `@measure_time` | 함수 실행 시간을 로그에 기록 | 응답 시간 측정 |
+| `cost_korean_won` · `get_usd_krw` | 모델별 토큰 수를 단가표로 달러 환산 → 원화 환산. 환율은 **한국수출입은행 → 한국은행 ECOS → 기본값** 순으로 대체해 외부 API가 죽어도 대시보드가 멈추지 않음 | 대시보드 비용 표 |
+| `insert_usage` | 모든 LLM 호출의 기능(flow)·모델·토큰을 `llm_usage`에 기록 | 4개 그래프 전체 |
+
+</details>
+
+### 임세준이 해결한 문제
+
+| 문제 | 원인 | 해결 |
+|---|---|---|
+| **다른 사용자의 화면이 그대로 보임** | 로그아웃해도 Gradio 화면 부품의 값은 남아 있음 | 화면 주인을 추적해 다른 사람이 로그인하면 17개 부품 초기화 (#321) |
+| **"자료 없음 비율"·평균 응답 시간 왜곡** | 잡담·오류 응답까지 함께 집계됨 | `route IN ('rag', 'no_answer')`인 실제 답변만 집계하고, 평균 응답 시간은 답변 하나하나를 같은 무게로 평균 내도록 수정 (#403) |
+| **가린 개인정보가 기울임 글씨로 깨짐** | 마스킹 문자 `홍*동`의 `*`를 마크다운이 서식으로 해석 | 화면 표시용 문자열에서만 `*`·`_`를 이스케이프 (#408) |
+| **서버 재시작 후 대화 이어가기 불가** | LangGraph 체크포인터가 메모리 기반이라 재시작하면 비어 있음 | DB 기록으로 체크포인터를 다시 채우는 `restore_session` (#253) |
+| **새 대화의 첫 질문 기록이 저장되지 않음** | `qa_logs`가 FK로 참조하는 `chat_sessions` 줄이 아직 없어 FK 위반 | 세션 줄을 `ON DUPLICATE KEY UPDATE`로 먼저 만들고 질문 기록과 한 트랜잭션으로 저장 (#304) |
+
+### 검증 방식: DB 없이 돌리는 확인 스크립트 17개
+
+기능마다 `tests/try_*.py` 확인 스크립트를 함께 만들었습니다(로그인, 기록, 대시보드 SQL 1·2차, 화면 주인, 관리자 탭 등 17개). 예를 들어 `try_qa_log_session.py`는 파이썬 기본 **SQLite 메모리 DB에 실제 스키마와 FK를 재현**하고 진짜 `insert_qa_log()`를 실행해, MySQL·`.env` 없이도 FK 위반이 고쳐졌는지 바로 확인할 수 있습니다.
 
 ---
 
@@ -119,7 +250,7 @@
 아래 GIF는 시연 영상을 기능별로 나눈 것입니다. 각 항목을 눌러 펼쳐 보세요.
 
 <details open>
-<summary><b>① 회원가입 · 로그인</b></summary>
+<summary><b>① 회원가입 · 로그인</b> · <code>👤 임세준</code></summary>
 <br/>
 
 <img src="docs/demo/01_signup_login.gif" alt="회원가입과 로그인" width="860" />
@@ -187,7 +318,7 @@
 </details>
 
 <details>
-<summary><b>⑦ 과거 대화 이어가기</b></summary>
+<summary><b>⑦ 과거 대화 이어가기</b> · <code>👤 임세준</code></summary>
 <br/>
 
 <img src="docs/demo/07_chat_history.gif" alt="과거 대화 기록" width="860" />
@@ -221,7 +352,7 @@
 </details>
 
 <details>
-<summary><b>⑩ 관리자 대시보드</b></summary>
+<summary><b>⑩ 관리자 대시보드</b> · <code>👤 임세준</code></summary>
 <br/>
 
 <img src="docs/demo/10_admin.gif" alt="관리자 대시보드" width="860" />
@@ -251,13 +382,14 @@
 
 | 메뉴 | 화면 | 주요 기능 | 권한 |
 |---|---|---|---|
+| 로그인 | 로그인·회원가입 `👤 임세준` | 가입, 로그인, 역할별 첫 화면 분기 | 전체 |
 | 보고서 | 목록·검색 | 보고서 검색, 요약·질의응답으로 바로 이동 | 사용자 |
 | 보고서 | 지표 비교표 | 보고서 2~5개의 경제 지표를 차트·표·ECOS 데이터로 비교 | 사용자 |
 | 보고서 | 업로드 | 보고서 PDF 업로드(다중 업로드, 중복 업로드 방지) | 사용자 |
 | 요약, 분석 | 요약·분석 | 3줄 요약, 섹션별 요약, 여러 보고서 병합 | 사용자 |
 | 질의응답 | 채팅 | 보고서 근거 질의응답, 질문 수준, 추천 질문, 출처, 피드백 | 사용자 |
-| 질의응답 | 수치 검증 · 용어 검색 · 과거 대화 | ECOS 대조, 용어 사이드바, 대화 이어가기 | 사용자 |
-| 관리자 | 보고서 관리 · 통계 · 에러 로그 | 업로드, 사용 현황·답변 품질·비용, 오류 기록 | 관리자 |
+| 질의응답 | 수치 검증 · 용어 검색 · 과거 대화 | ECOS 대조, 용어 사이드바, 대화 이어가기 (과거 대화: `👤 임세준`) | 사용자 |
+| 관리자 | 보고서 관리 · 통계 · 에러 로그 `👤 임세준` | 업로드, 사용 현황·답변 품질·비용, 오류 기록 | 관리자 |
 
 ### 사용자 흐름
 
@@ -286,7 +418,7 @@ flowchart LR
 
 | 계층 | 역할 | 구성 |
 |---|---|---|
-| ① 화면 | 사용자가 보는 웹 화면 | Gradio (`hri/view`) |
+| ① 화면 | 사용자가 보는 웹 화면 | Gradio (`hri/view`), 메인 앱 조립·로그인·기록·관리자 화면은 `👤 임세준` |
 | ② 기능 처리 | 요청을 받아 업무 흐름 실행 | Service (`hri/service`) + LangGraph 그래프 4종 (`hri/graph`) |
 | ③ AI · 외부 데이터 | 답변 생성과 최신 정보 | OpenAI (LLM·Vision·임베딩), ECOS, 한국수출입은행 |
 | ④ 저장소 | 정보 보관 | MySQL (보고서·지표·기록·비용), ChromaDB (검색용 벡터 색인) |
@@ -348,7 +480,7 @@ flowchart LR
 | 근거 기반 답변 | 구분자(`###`) + 규칙 | `[자료]`만 근거로 답하고 없으면 "자료에 없습니다" |
 | 도구 사용 에이전트 | Tool Calling | ECOS 통계·환율 조회 도구를 AI가 골라 호출하고 결과를 보고 다시 판단 |
 
-모든 LLM 호출의 토큰 사용량을 `llm_usage` 테이블에 기록해 관리자 대시보드에서 기능별 원화 비용으로 보여 줍니다.
+모든 LLM 호출의 토큰 사용량을 `llm_usage` 테이블에 기록해 관리자 대시보드에서 기능별 원화 비용으로 보여 줍니다. (사용량 기록·원화 환산·대시보드: `👤 임세준`)
 
 > 자세한 내용: [`docs/project_structure.md`](docs/project_structure.md) · [`docs/prompt_design.md`](docs/prompt_design.md) · [`docs/qa_design.md`](docs/qa_design.md)
 
@@ -393,7 +525,7 @@ erDiagram
 |---|---|---|
 | 보고서 내용 | `reports`, `sections`, `chunks`, `report_tables`, `indicators` | 보고서를 섹션(큰 단락)과 청크(작은 조각)로 나눠 저장. 지표는 값·단위·기간·쪽수와 함께 별도 저장해 비교표의 재료로 사용 |
 | 대화·기록 | `chat_sessions`, `chat_session_reports`, `qa_logs`, `qa_log_sources` | 질문·답변은 개인정보를 가려 기록하고, 답변에 실제로 쓴 출처를 함께 저장 |
-| 회원·사용량 | `users`, `llm_usage` | 회원과 역할, 호출별 토큰 사용량과 비용 |
+| 회원·사용량 | `users`, `llm_usage` | 회원과 역할, 호출별 토큰 사용량과 비용 (회원·사용량·기록 DAO와 대시보드 집계 SQL: `👤 임세준`) |
 
 > 스키마 전체: [`sql/schema.sql`](sql/schema.sql)
 
@@ -427,10 +559,11 @@ erDiagram
 </details>
 
 <details>
-<summary><b>4. 대시보드 수치 왜곡</b></summary>
+<summary><b>4. 대시보드 수치 왜곡</b> · <code>👤 임세준</code></summary>
 
 - **문제**: 잡담과 오류 응답이 섞여 "자료 없음 비율"이 부풀려졌습니다.
 - **해결**: 처리 방식(route)이 `rag`·`no_answer`인 응답만 집계하도록 바꿔 실제 답변 품질을 보여 주게 했습니다.
+- 임세준이 해결한 다른 사례는 [여기](#임세준이-해결한-문제)에 정리했습니다.
 
 </details>
 
@@ -538,7 +671,7 @@ python app.py
 highlight-refresh-integrate/
 ├─ app.py                 실행 파일 (hri.view.app.main 호출)
 ├─ hri/                   애플리케이션 패키지
-│  ├─ view/               Gradio 화면 (보고서·요약·질의응답·기록·관리자)
+│  ├─ view/               Gradio 화면 (보고서·요약·질의응답·기록·관리자)  👤 app·user·history·admin
 │  ├─ service/            화면 요청 처리 흐름
 │  ├─ graph/              LangGraph 그래프 (ingest · qa · summary · agent)
 │  ├─ loader/             PDF 텍스트·표·차트 추출
@@ -548,11 +681,11 @@ highlight-refresh-integrate/
 │  ├─ prompt/             RAG·요약·페르소나 프롬프트
 │  ├─ memory/             대화 기록 관리
 │  ├─ router/             Tool Calling 도구 목록·에이전트 실행
-│  ├─ llm/                LLM 호출·비용 계산
+│  ├─ llm/                LLM 호출·비용 계산  👤 원화 비용·환율
 │  ├─ api/                ECOS·환율 외부 API
-│  ├─ dao/                MySQL 접근
+│  ├─ dao/                MySQL 접근  👤 user·qa_log·usage·dashboard
 │  ├─ domain/schemas/     Pydantic 모델
-│  ├─ config/ exception/ util/ source/ suggest/
+│  ├─ config/ exception/ util/ source/ suggest/  👤 settings·errors·logger·metrics
 ├─ sql/schema.sql         MySQL 스키마
 ├─ docs/                  설계 문서, 시연 GIF (docs/demo)
 └─ assets/                폰트·로고
@@ -568,9 +701,9 @@ highlight-refresh-integrate/
 
 | <img src="https://github.com/HyeonsuRyu.png" width="100" /> | <img src="https://github.com/gmlwls02190.png" width="100" /> | <img src="https://github.com/dongan0718.png" width="100" /> | <img src="https://github.com/string2015-dev.png" width="100" /> | <img src="https://github.com/SOLUNA2.png" width="100" /> | <img src="https://github.com/HappYuBeen.png" width="100" /> |
 |:-:|:-:|:-:|:-:|:-:|:-:|
-| **류현수** | **김희진** | **서동안** | **엄정현** | **임세준** | **장유빈** |
+| **류현수** | **김희진** | **서동안** | **엄정현** | **임세준** ⭐ | **장유빈** |
 | 팀장 | 팀원 | 팀원 | 팀원 | 팀원 | 팀원 |
-| 환경 · 협업 · 통합 · ECOS | 요약 · 업로드 · 에이전트 | 질의응답 · 프롬프트 | 문서 처리 · Langgraph | 화면 · 관리자 | RAG 검색 · 지표 비교 |
+| 환경 · 협업 · 통합 · ECOS | 요약 · 업로드 · 에이전트 | 질의응답 · 프롬프트 | 문서 처리 · Langgraph | **화면 · 회원 · 기록 · 관리자** | RAG 검색 · 지표 비교 |
 | [@HyeonsuRyu](https://github.com/HyeonsuRyu) | [@gmlwls02190](https://github.com/gmlwls02190) | [@dongan0718](https://github.com/dongan0718) | [@string2015](https://github.com/string2015) | [@SOLUNA2](https://github.com/SOLUNA2) | [@HappYuBeen](https://github.com/HappYuBeen) |
 
 </div>
@@ -720,22 +853,25 @@ highlight-refresh-integrate/
 
 </details>
 
-<details>
-<summary><b>임세준</b> · 화면 설계, 관리자 대시보드, UI</summary>
+<details open>
+<summary><b>임세준</b> ⭐ · 메인 앱, 회원·기록, 관리자 대시보드, 운영 공통 모듈</summary>
 <br/>
 
 | 항목 | 내용 |
 |---|---|
 | GitHub | [@SOLUNA2](https://github.com/SOLUNA2) |
 | 연락처 | sejunqw@gmail.com |
-| 담당 업무 | 화면 설계, 메인 앱 구조, 로그인·회원, 대화·질문 기록, 관리자 대시보드, 예외 처리, UI 통합·다듬기 |
+| 담당 업무 | 화면 설계, 메인 앱 구조, 로그인·회원, 대화·질문 기록, 관리자 대시보드(SQL·화면), LLM 사용량·원화 비용, 예외 처리·로그, UI 통합·다듬기 |
+| 기여 규모 | 커밋 **170개(팀 최다)** · 병합 PR **39개** · **+6,276줄** · 단독 작성 모듈 10개 |
 
-**주요 기여**
+**주요 기여** · 자세한 내용은 [임세준의 기여](#임세준의-기여-화면관리자운영-계층) 섹션 참고
 
-- 관리자 대시보드(보고서 관리·통계·에러 로그) 구현, 처리 방식별 비율 표와 차트 추가
-- 로그인·회원가입 화면, 질의응답·보고서·요약 탭 UI 다듬기
-- 로고 적용, 마스킹 표시 개선
-- UI/UX 설명서 작성
+- **관리자 대시보드 단독 구현**: 집계 SQL 10종(`WITH ROLLUP`, `LEFT JOIN`) → 데이터 조립 → 화면·차트까지 1차·2차로 확장
+- **메인 앱 뼈대**: `build_app`·`init_state`로 전 탭을 조립하고 팀원 화면 이벤트 연결, 사용자 간 화면 분리(`clear_other_user_screen`)
+- **회원·권한**: 회원 스키마·DAO·서비스·화면 전 계층, 관리자 전용 탭 분리
+- **질문 기록·대화 이어가기**: `qa_logs` 기록과 LangGraph 체크포인터 복원(서버 재시작 후에도 이어서 질문 가능)
+- **운영 공통 모듈**: `@safe_call`(화면 18곳 사용)·`@measure_time`·토큰 원화 비용 계산·환율 3단계 대체
+- 로고 적용, 마스킹 표시 개선, 질의응답·보고서·요약 탭 UI 다듬기, UI/UX 설명서 작성
 
 **회고**
 
@@ -745,12 +881,13 @@ highlight-refresh-integrate/
 > 쌓아 온 DB 설계와 SQL이 하나로 이어지는 걸 확인할 수 있었습니다.
 
 > `[잘한 점 · Keep]`  
-> 회원가입·로그인, 질문 기록 저장·조회, LLM 사용량 기록, 관리자 대시보드(SQL·화면), 예외 처리, 메인 앱 
-> 가장 기억에 남는 순간은 대시보드에 실제 질문 기록이 집계되어 TOP 10과 일별 추이 차트가 처음 화면에 떴을 때입니다. 쌓아 온 DB 설계와 SQL이 하나로 이어지는 걸 확인할 수 있었습니다.  
+> 대시보드를 한 번에 다 만들지 않고 1차(핵심 지표) → 2차(추이·품질·처리 방식)로 나눠, 매 단계 화면에서 동작하는 상태로 PR을 올렸습니다.  
+> 기능마다 DB 없이 실행할 수 있는 확인 스크립트를 함께 만들어, 팀원이 제 코드를 바로 돌려 볼 수 있게 했습니다.  
+> 함수마다 순서·입력·출력을 docstring으로 남겨 다른 팀원이 제 모듈을 연결할 때 막히지 않게 했습니다.
 
 > `[어려웠던 점과 해결 과정 · Problem]`  
-> 첫 팀 프로젝트를 해보면서 처음 해보는 업무들을 맡았는데, 처음 해보는 업무를 하다 보니 UI 부분에서 어려움을 많이 겪었음.  
-> 팀원들과의 소통으로 UI개선 부분에서 도움을 받고 개선을 함.  
+> 첫 팀 프로젝트에서 처음 해 보는 업무들을 맡아 UI 부분에서 어려움을 많이 겪었습니다.  
+> 팀원들과 계속 소통하며 도움을 받았고, 마지막 사흘 동안 질의응답·보고서·관리자 화면을 집중적으로 다듬어 개선했습니다.  
 
 > `[다음에 시도할 것 · Try]`  
 > UI를 최대한 세부적인 사항들까지 먼저 정하고 프로젝트를 시작하기
